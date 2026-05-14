@@ -1,6 +1,27 @@
 # Cloudflare Worker sing-box 配置生成器
 
-这是一个单文件 Cloudflare Worker。只要在 Cloudflare 网页面板里完成配置，就不需要 `wrangler.toml`。
+这是一个 Cloudflare Worker，用远程 `singbox2.json` 模板和 `kurasshu.yaml` 里的 `proxy-providers` 自动生成 sing-box JSON 配置。
+
+仓库里包含最小 `wrangler.toml`，只管理 Worker 入口和 Cron。URL、访问 token、KV 绑定仍然在 Cloudflare 网页面板里配置，不写入仓库。
+
+## wrangler.toml
+
+当前 `wrangler.toml` 只包含：
+
+```toml
+name = "singbox-conventer"
+main = "worker.js"
+compatibility_date = "2026-05-14"
+
+[triggers]
+crons = ["*/10 * * * *"]
+```
+
+这样 GitHub 自动部署时可以直接使用：
+
+```bash
+npx wrangler deploy
+```
 
 ## 必需的面板配置
 
@@ -50,21 +71,19 @@ USER_AGENT = clash.meta
 
 ## Cron
 
-在 Cloudflare 网页面板里添加 Cron Trigger：
+Cron 已经写在 `wrangler.toml`：
 
 ```text
 */10 * * * *
 ```
 
-Cron 会每 10 分钟自动刷新：
+Cloudflare 会每 10 分钟自动调用 Worker 的 `scheduled()`，刷新：
 
 - 远程 `singbox2.json` 模板
 - 远程 `kurasshu.yaml`
 - `proxy-providers` 里的所有 provider
 - 转换后的 sing-box JSON
 - `/health` 状态信息
-
-不设置 Cron 也能用，但只有客户端访问时才会触发刷新。建议设置 Cron。
 
 ## 注意事项
 

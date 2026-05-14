@@ -1,0 +1,6 @@
+name = "singbox-conventer"
+main = "worker.js"
+compatibility_date = "2026-05-14"
+
+[triggers]
+crons = ["*/10 * * * *"]
